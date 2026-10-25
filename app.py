@@ -27,7 +27,7 @@ st.caption(
     "※免責事項: 本ツールは市場心理・オプション・AI分析による情報提供を目的としており、投資助言を行うものではありません。"
 )
 
-# --- 2. ユーザー設定（監視銘柄 & 保有データ） ---
+# --- 2. ユーザー設定（監視銘柄 & URLからの保有データ復元） ---
 st.sidebar.header("⚙️ ポートフォリオ設定")
 
 default_tickers = "NVDA, AMZN, META, GOOGL"
@@ -39,22 +39,40 @@ user_input = st.sidebar.text_area(
 ticker_list = [t.strip().upper() for t in user_input.split(",") if t.strip()]
 st.query_params["tickers"] = ", ".join(ticker_list)
 
-st.sidebar.subheader("💰 保有数量・平均取得単価（任意）")
+st.sidebar.subheader("💰 保有数量・平均取得単価")
+st.sidebar.caption("※入力内容はURLに自動保存され、次回以降も維持されます。")
+
 holding_data = {}
 for ticker in ticker_list:
+    # URLクエリパラメータから前回の保存値を復元（なければ初期値0.0）
+    default_shares = float(st.query_params.get(f"s_{ticker}", 0.0))
+    default_cost = float(st.query_params.get(f"c_{ticker}", 0.0))
+
     with st.sidebar.expander(f"{ticker} の保有詳細"):
         shares = st.number_input(
-            f"{ticker} 保有株数", min_value=0.0, value=0.0, step=1.0, key=f"s_{ticker}"
+            f"{ticker} 保有株数", min_value=0.0, value=default_shares, step=1.0, key=f"s_{ticker}"
         )
         avg_cost = st.number_input(
             f"{ticker} 取得単価",
             min_value=0.0,
-            value=0.0,
+            value=default_cost,
             step=0.1,
             key=f"c_{ticker}",
         )
+        
+        # URLクエリパラメータを更新して保持
         if shares > 0:
+            st.query_params[f"s_{ticker}"] = str(shares)
             holding_data[ticker] = {"shares": shares, "avg_cost": avg_cost}
+        else:
+            if f"s_{ticker}" in st.query_params:
+                del st.query_params[f"s_{ticker}"]
+
+        if avg_cost > 0:
+            st.query_params[f"c_{ticker}"] = str(avg_cost)
+        else:
+            if f"c_{ticker}" in st.query_params:
+                del st.query_params[f"c_{ticker}"]
 
 # --- 3. マクロ指標の取得 ---
 @st.cache_data(ttl=600)
@@ -269,7 +287,7 @@ with tab5:
                 try:
                     client = genai.Client(api_key=gemini_key)
                     prompt = f"""
-あなたは機関投資家のベテラン・アナリストです。以下の企業決算や経営陣の発言（英文または日本語）の「行間」を読み解く、表向きの良いニュースの裏に隠されたリスク、経営陣のトーンの変化（弱気なニュアンスなど）、個人投資家が見落としがちな本音を鋭く分析してください。
+あなたは機関投資家のベテラン・アナリストです。以下の企業決算や経営陣の発言（英文または日本語）の「行間」を読み解き、表向きの良いニュースの裏に隠されたリスク、経営陣のトーンの変化（弱気なニュアンスなど）、個人投資家が見落としがちな本音を鋭く分析してください。
 【入力テキスト】
 {earning_text_input}
 """
