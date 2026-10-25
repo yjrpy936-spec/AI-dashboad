@@ -171,7 +171,7 @@ with tab1:
 【マクロ】米10年債:{us10y}%, ドル円:{usdjpy}円, VIX:{vix}, NASDAQ:{nasdaq}
 【ポートフォリオ】\n{summary_text_for_ai}
 """
-                    res = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+                    res = client.models.generate_content(model="gemini-3.8-flash", contents=prompt)
                     st.success("分析完了")
                     st.markdown(res.text)
                 except Exception as e:
@@ -193,7 +193,7 @@ with tab2:
 【データ】\n{summary_text_for_ai}
 【マクロ】VIX: {vix}, 米10年債: {us10y}%
 """
-                    res = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+                    res = client.models.generate_content(model="gemini-3.8-flash", contents=prompt)
                     st.success("診断完了")
                     st.markdown(res.text)
                 except Exception as e:
@@ -224,7 +224,7 @@ with tab3:
 あなたはリスク管理の専門家です。以下のポートフォリオに対し、選択されたシナリオ（{stress_type}）が発動した場合、それぞれの銘柄や全体資産にどのような致命的ダメージ、あるいは恩恵があるかを推算し、具体的な防衛策を提案してください。
 【ポートフォリオ】\n{summary_text_for_ai}
 """
-                    res = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+                    res = client.models.generate_content(model="gemini-3.8-flash", contents=prompt)
                     st.success("ストレステスト完了")
                     st.markdown(res.text)
                 except Exception as e:
@@ -246,7 +246,7 @@ with tab4:
 【銘柄リスト】: {ticker_list}
 【データ】\n{summary_text_for_ai}
 """
-                    res = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+                    res = client.models.generate_content(model="gemini-3.8-flash", contents=prompt)
                     st.success("相関分析完了")
                     st.markdown(res.text)
                 except Exception as e:
@@ -269,11 +269,11 @@ with tab5:
                 try:
                     client = genai.Client(api_key=gemini_key)
                     prompt = f"""
-あなたは機関投資家のベテラン・アナリストです。以下の企業決算や経営陣の発言（英文または日本語）の「行間」を読み解き、表向きの良いニュースの裏に隠されたリスク、経営陣のトーンの変化（弱気なニュアンスなど）、個人投資家が見落としがちな本音を鋭く分析してください。
+あなたは機関投資家のベテラン・アナリストです。以下の企業決算や経営陣の発言（英文または日本語）の「行間」を読み解く、表向きの良いニュースの裏に隠されたリスク、経営陣のトーンの変化（弱気なニュアンスなど）、個人投資家が見落としがちな本音を鋭く分析してください。
 【入力テキスト】
 {earning_text_input}
 """
-                    res = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+                    res = client.models.generate_content(model="gemini-3.8-flash", contents=prompt)
                     st.success("行間分析完了")
                     st.markdown(res.text)
                 except Exception as e:
